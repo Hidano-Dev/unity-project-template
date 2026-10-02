@@ -17,6 +17,8 @@
 #     ダウングレードを避けるため warning を出してスキップする。
 #   - 適合版を解決できないパッケージも warning を出して現行バージョンを維持する。
 #   - packages-lock.json は削除し、Unity 初回起動時に再生成させる。
+#   - PRERELEASE_PACKAGES に列挙したパッケージは安定版が未公開のため、
+#     pre/exp 版も候補に含める (例: Unity CLI 連携用の com.unity.pipeline)。
 # =============================================================================
 set -euo pipefail
 
@@ -24,6 +26,8 @@ EDITOR_VER="$1"
 PROJECT_DIR="$2"
 MANIFEST="$PROJECT_DIR/Packages/manifest.json"
 EDITOR_MM=$(echo "$EDITOR_VER" | awk -F. '{print $1"."$2}')  # 例: 6000.0
+# 安定版が未公開で pre/exp 版を採用するパッケージ (resolve-upm.sh と揃えること)
+PRERELEASE_PACKAGES="com.unity.pipeline"
 
 if [ ! -f "$MANIFEST" ]; then
   echo "::error::$MANIFEST が見つかりません" >&2
@@ -54,13 +58,16 @@ for pkg in $(jq -r '.dependencies | keys[]' "$MANIFEST" | tr -d '\r'); do
     echo "::warning::$pkg: 現行 $cur がレジストリに存在しない (Editor 同梱系) ため自動更新をスキップします。必要なら Unity で開いて調整してください"
     continue
   fi
-  ver=$(echo "$META" | jq -r --arg em "$EDITOR_MM" '
+  ALLOW_PRE=false
+  case " $PRERELEASE_PACKAGES " in *" $pkg "*) ALLOW_PRE=true ;; esac
+  ver=$(echo "$META" | jq -r --arg em "$EDITOR_MM" --argjson pre "$ALLOW_PRE" '
     def mm: tostring | split(".") | [(.[0] // "0" | tonumber? // 0), (.[1] // "0" | tonumber? // 0)];
     .versions? // {} | if type == "object" then . else {} end | to_entries
-    | map(select(.key | test("-") | not))                         # pre/exp 版を除外
+    | map(select($pre or (.key | test("-") | not)))               # pre/exp 版を除外 (PRERELEASE_PACKAGES は除く)
     | map(select(((.value.unity? // "0.0") | mm) <= ($em | mm)))  # Editor 要求を満たす版のみ
     | map(.key)
-    | sort_by(split(".") | map(tonumber? // 0))
+    # 本体バージョン順。同じ本体なら安定版 > pre/exp 版、pre/exp 同士は文字列順
+    | sort_by([(split("-")[0] | split(".") | map(tonumber? // 0)), (if test("-") then 0 else 1 end), .])
     | last // empty
   ' 2>/dev/null | tr -d '\r' || true)
   if [ -z "$ver" ]; then

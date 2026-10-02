@@ -1,6 +1,6 @@
 # プロジェクトセットアップガイド
 
-このリポジトリは Unity プロジェクトテンプレートから生成され、GitHub Actions によって自動初期化されています (SDD ワークフロー設定の取り込み・設定済みプロジェクトのリネーム・Unity バージョン固定)。
+このリポジトリは Unity プロジェクトテンプレートから生成され、GitHub Actions によって自動初期化されています (設定済みプロジェクトのリネーム・Unity バージョン固定)。
 
 リポジトリ直下の各ディレクトリがそれぞれ独立した Unity プロジェクトです。生成時には、テンプレートに同梱された設定済みプロジェクト (パッケージ構成・ProjectSettings・URP 設定込み) がリポジトリ名にリネームされて 1 つ配置されています (ProjectSettings の productName もリポジトリ名に設定済み)。**最初のプロジェクトはこの自動作成分で足りるため、Add Another Project を実行する必要はありません** (名前どおり、2 つ目以降を増やすためのものです)。
 
@@ -38,18 +38,23 @@
 
 リポジトリ直下に `Assets/`, `Packages/`, `ProjectSettings/` を備えた骨組みが作成されます (初期プロジェクトのような設定済み構成のコピーではなく最小構成です)。
 
-## SDD ワークフロー設定を最新化したい場合
+## AI エージェントから Unity を操作する (Unity CLI)
 
-kiro commands / dev-orchestrator skill などの SDD ワークフロー一式 (`.claude/` `.codex/` `.kiro/` `.agents/` `AGENTS.md`) は [agentic-dev-harness](https://github.com/Hidano-Dev/agentic-dev-harness) から取り込まれています。最新に追従したい場合:
+エージェントからの Unity 操作には公式の Unity CLI (`unity` コマンド) を使います。各プロジェクトには CLI から Editor を操作するための `com.unity.pipeline` パッケージが入っており、Claude Code / Codex 向けの `unity-cli` skill がリポジトリ直下 (`.claude/skills/` `.agents/skills/`) にあります。
 
-1. Actions タブ →「**Orchestration Sync**」→「Run workflow」
-2. 完了後に `git pull` (差分がある時だけ `chore: sync orchestration assets` コミットが積まれます)
+1. 各自のマシンに Unity CLI をインストールする (手順は `.claude/skills/unity-cli/SKILL.md` の「Step 1」)
+2. `unity open <プロジェクトディレクトリ>` で Editor を開くと、`unity status` / `unity command` でエージェントから操作できます
 
-ルート `CLAUDE.md` (プロジェクト固有メモ) には触れません。
+使い方の要点は `CLAUDE.md` にまとめてあります。
+
+## SDD (仕様駆動開発) を使いたい場合
+
+このリポジトリには SDD ワークフローは入っていません。必要なら [unity-sdd-kit](https://github.com/Hidano-Dev/unity-sdd-kit) の手順で導入してください。
 
 ## 困ったときは
 
-- **SDD の設定 (`.claude/` 等) やプロジェクトディレクトリが見当たらない** → 初期化コミット前の状態です。`git pull` してください。
+- **プロジェクトディレクトリがリポジトリ名になっていない (`TemplateProject/` のまま)** → 初期化コミット前の状態です。`git pull` してください。
+- **`unity status` で Editor に接続できない** → コンパイルエラーで Safe Mode になっている可能性があります。`unity pipeline list` で確認し、エラーを直してください。
 - **Add Another Project が「既に存在します」で止まる** → リポジトリ名と同じ名前を指定しています。最初のプロジェクトは初期化時に自動作成済みなので、そのまま `git pull` して使ってください。名前やバージョンを変えたい場合は Update Project を使います。
 - **プロジェクト更新 / プロジェクト追加が反映されない** → Actions の実行結果を確認してください。bot の push が拒否されている場合は、リポジトリ設定の Workflow permissions を「Read and write permissions」にします。
 

@@ -22,20 +22,26 @@ EDITOR_MM=$(echo "$EDITOR_VER" | awk -F. '{print $1"."$2}')  # 例: 6000.0
 # ─────────────────────────────────────────────
 # プロジェクトに含めたい公式パッケージはここに列挙する
 # ─────────────────────────────────────────────
-PACKAGES="com.unity.inputsystem com.unity.test-framework"
+PACKAGES="com.unity.inputsystem com.unity.test-framework com.unity.pipeline"
+# 安定版が未公開で pre/exp 版を採用するパッケージ (update-manifest.sh と揃えること)
+# com.unity.pipeline は Unity CLI からエディタを操作するために必要
+PRERELEASE_PACKAGES="com.unity.pipeline"
 
 mkdir -p "$PROJECT_DIR/Packages"
 {
   echo '{ "dependencies": {'
   FIRST=true
   for pkg in $PACKAGES; do
-    ver=$(curl -sf "https://packages.unity.com/$pkg" | jq -r --arg em "$EDITOR_MM" '
+    ALLOW_PRE=false
+    case " $PRERELEASE_PACKAGES " in *" $pkg "*) ALLOW_PRE=true ;; esac
+    ver=$(curl -sf "https://packages.unity.com/$pkg" | jq -r --arg em "$EDITOR_MM" --argjson pre "$ALLOW_PRE" '
       def mm: tostring | split(".") | [(.[0] // "0" | tonumber? // 0), (.[1] // "0" | tonumber? // 0)];
       .versions? // {} | if type == "object" then . else {} end | to_entries
-      | map(select(.key | test("-") | not))                        # pre/exp 版を除外
+      | map(select($pre or (.key | test("-") | not)))              # pre/exp 版を除外 (PRERELEASE_PACKAGES は除く)
       | map(select(((.value.unity? // "0.0") | mm) <= ($em | mm)))  # Editor 要求を満たす版のみ
       | map(.key)
-      | sort_by(split(".") | map(tonumber? // 0))
+      # 本体バージョン順。同じ本体なら安定版 > pre/exp 版、pre/exp 同士は文字列順
+      | sort_by([(split("-")[0] | split(".") | map(tonumber? // 0)), (if test("-") then 0 else 1 end), .])
       | last // empty
     ' 2>/dev/null || true)
     if [ -z "$ver" ]; then

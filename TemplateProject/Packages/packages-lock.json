@@ -77,8 +77,22 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.pipeline": {
+      "version": "0.8.0-exp.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.33",
+        "com.unity.nuget.mono-cecil": "1.11.6",
+        "com.unity.modules.uielements": "1.0.0",
+        "com.unity.modules.jsonserialize": "1.0.0",
+        "com.unity.modules.screencapture": "1.0.0",
+        "com.unity.nuget.newtonsoft-json": "3.0.2"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.recorder": {
-      "version": "5.1.6",
+      "version": "5.1.7",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -169,7 +183,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.8.12",
+      "version": "1.8.13",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -188,17 +202,6 @@
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
       }
-    },
-    "io.github.hatayama.uloopmcp": {
-      "version": "3.0.0-beta.74",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.nuget.mono-cecil": "1.11.6",
-        "com.unity.nuget.newtonsoft-json": "3.2.1",
-        "com.unity.ugui": "1.0.0"
-      },
-      "url": "https://package.openupm.com"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",

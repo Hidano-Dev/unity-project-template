@@ -1,18 +1,29 @@
 # 開発メモ
 
-## SDD ワークフロー
+## リポジトリ構成
 
-@.claude/rules/sdd-workflow.md
+リポジトリ直下の各ディレクトリ（`ProjectSettings/ProjectVersion.txt` を持つもの）がそれぞれ独立した Unity プロジェクト。リポジトリ直下に `Assets/` は無いため、Unity 関連のコマンドは対象プロジェクトのディレクトリを指定して実行する。
 
-上記は [agentic-dev-harness](https://github.com/Hidano-Dev/agentic-dev-harness) から初期化時 (Template Init) / 同期時 (Orchestration Sync) に取り込まれる SDD ワークフローメモへの参照。テンプレートリポジトリ自体には実体が無いため、取り込み前は単に読み込まれない。
+## Unity の操作は Unity CLI で行う
 
-## Unity Editor をコマンドラインで起動するとき
+Unity Editor の起動・操作・テスト・ビルドは Unity CLI（`unity` コマンド）で行う。詳しい使い方はリポジトリ直下の `unity-cli` skill（`.claude/skills/unity-cli/`、Codex 向けは `.agents/skills/unity-cli/`）を参照。
 
-CLI から Unity Editor を起動して自動化処理（ビルド、テスト、エージェント操作など）を行う場合は、**`-automated` フラグを付ける**。
+- 未インストールなら skill の「Step 1: Install the CLI」の手順で入れる（マシンごとに 1 回。リポジトリには含まれない）。
+- 各プロジェクトには Editor を CLI から操作するための `com.unity.pipeline` パッケージが入っている（Unity 6.0 以降）。無いプロジェクトには `unity pipeline install --project-path <プロジェクトディレクトリ>` で入れる。
+- よく使うコマンド:
 
 ```
-"C:\Program Files\Unity\Hub\Editor\<バージョン>\Editor\Unity.exe" -projectPath "<プロジェクトディレクトリ>" -automated
+unity open <プロジェクトディレクトリ> --args "-automated"   # 正しいバージョンの Editor で開く（自動化用）
+unity status                                               # 接続中の Editor 一覧（state が ready なら操作可能）
+unity command                                              # Editor が公開しているコマンド一覧
+unity test <プロジェクトディレクトリ> --mode EditMode        # テスト実行（結果は test-results.xml）
 ```
+
+- `unity status` で接続できないときは、コンパイルエラーで Safe Mode になっていないかを `unity pipeline list` で確認する（Safe Mode では pipeline パッケージが読み込まれない）。
+
+## 自動化で Editor を起動するときは `-automated` を付ける
+
+CLI から Unity Editor を起動して自動化処理（ビルド、テスト、エージェント操作など）を行う場合は、Editor に **`-automated` フラグを渡す**（`unity open` なら `--args "-automated"`、Unity.exe を直接起動するなら引数に追加）。
 
 - 未保存シーンの確認などの**ブロッキングダイアログが表示されなくなり**、各ダイアログの既定アクションが自動選択されるため、処理が途中で停止しない。
 - `-batchmode` と違い GUI ありの起動でも使える（Unity 6 系で確認）。
