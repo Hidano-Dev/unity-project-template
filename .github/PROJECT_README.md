@@ -17,9 +17,9 @@
 
 1. Actions タブ →「**Update Project**」→「Run workflow」
 2. 変えたい項目だけ入力して実行 (両方同時も可)
-   - `name`: 新しいプロジェクト名 (ディレクトリ名と ProjectSettings.asset の productName の両方が変わります)
-   - `version`: 新しい Unity バージョン (例: `6000.0.32f1`)
-   - `project`: プロジェクトが 1 つだけなら空欄のままで自動検出されます
+   - `project`: 変更対象のプロジェクト名 (現在のディレクトリ名)。プロジェクトが 1 つだけなら空欄のままで自動検出されます
+   - `name`: 変更後のプロジェクト名 (ディレクトリ名と ProjectSettings.asset の productName の両方が変わります)
+   - `version`: 変更後の Unity バージョン (例: `6000.0.32f1`)
 3. 完了後に `git pull`。名前を変えた場合は Unity Hub で新しいディレクトリを「Add project from disk」で指定し直す
 
 バージョン変更では ProjectVersion.txt の書き換えと、manifest.json 内の公式 UPM パッケージ (`com.unity.*`) の対象 Editor 適合版への揃え直しが自動で行われます (OpenUPM 等のサードパーティパッケージと scopedRegistries には触れません)。URP など Editor 同梱系のパッケージは warning を出して自動更新をスキップするため、Unity で開いた際に必要に応じて調整してください。存在しないバージョンを入力した場合はエラーで停止するだけで、リポジトリは変更されません。利用可能なバージョン一覧は `.github/unity-versions.tsv` (生成時点のスナップショット) で確認できます。
