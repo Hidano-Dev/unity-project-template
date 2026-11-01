@@ -8,8 +8,6 @@ GitHub のテンプレートリポジトリ機能を使い、新規 Unity プロ
 
 AI エージェントからの Unity 操作には公式の [Unity CLI](https://unity.com/) (`unity` コマンド) を標準ツールとして使います。各プロジェクトには Editor を CLI から操作するための `com.unity.pipeline` パッケージを入れてあり、Claude Code / Codex 向けの `unity-cli` skill をリポジトリ直下に同梱しています。
 
-本テンプレートは SDD (仕様駆動開発) などの開発ワークフローには依存しません。SDD を使う場合は、生成したリポジトリに [unity-sdd-kit](https://github.com/Hidano-Dev/unity-sdd-kit) を後から導入します。
-
 リポジトリは**マルチプロジェクト構成**を前提とします。リポジトリ直下に Assets 等は置かず、プロジェクトごとにディレクトリを設けます。初期化時には同梱の `TemplateProject/` が**リポジトリ名にリネーム** (ディレクトリ名 + ProjectSettings の productName) され、以後は Actions から既存プロジェクトの更新 (名前・Unity バージョン) とプロジェクトの追加を実行できます。**最初のプロジェクトは初期化で自動作成されるため、Add Another Project を実行する必要はありません** (名前どおり、2 つ目以降を増やすときに使います)。
 
 Unity Editor は運用安定化のため標準バージョン (ステークホルダー間で最も使われている安定版) に固定し、UPM パッケージは各プロジェクトの Editor バージョンに適合する最新版を採用します。Editor バージョンの上げ下げはプロジェクト単位で、生成後のリポジトリの Actions タブ (Update Project) から誰でも実行できます。
@@ -125,8 +123,6 @@ AI エージェントからの Unity 操作 (Editor の起動・ライブ操作�
 4. Unity Hub の「Add project from disk」で**プロジェクトディレクトリ** (リポジトリ直下ではない) を指定して開く。標準バージョンが未インストールなら Hub がインストールを案内します (changeset 入りなので正確なビルドに誘導されます)。
 5. 初回起動で生成される `Packages/packages-lock.json` をコミットしておくと、メンバー間でパッケージ解決が揃います。
 6. AI エージェントから Unity を操作する場合は、各自のマシンに Unity CLI をインストールします (手順は `.claude/skills/unity-cli/SKILL.md` の「Step 1」)。Unity Hub の代わりに `unity open <プロジェクトディレクトリ>` で開くこともできます。
-7. SDD (仕様駆動開発) を使う場合は、[unity-sdd-kit](https://github.com/Hidano-Dev/unity-sdd-kit) の手順で導入します。
-
 ### 4.2 既存プロジェクトの更新 (名前 / Unity バージョン)
 
 **Unity バージョンの変更は、対象プロジェクトの初回起動前 (開始時) に行うことを想定しています。**

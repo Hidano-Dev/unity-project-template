@@ -47,10 +47,6 @@
 
 使い方の要点は `CLAUDE.md` にまとめてあります。
 
-## SDD (仕様駆動開発) を使いたい場合
-
-このリポジトリには SDD ワークフローは入っていません。必要なら [unity-sdd-kit](https://github.com/Hidano-Dev/unity-sdd-kit) の手順で導入してください。
-
 ## 困ったときは
 
 - **プロジェクトディレクトリがリポジトリ名になっていない (`TemplateProject/` のまま)** → 初期化コミット前の状態です。`git pull` してください。
